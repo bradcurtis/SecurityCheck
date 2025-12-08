@@ -16,8 +16,7 @@
   <SupportUrl DefaultValue="https://www.contoso.com/help"/>
 
   <AppDomains>
-    <AppDomain>https://www.contoso.com</AppDomain>
-    <AppDomain>https://localhost:5199</AppDomain>
+    <AppDomain>https://localhost:3000</AppDomain>
   </AppDomains>
 
   <Hosts>
@@ -30,6 +29,7 @@
     </Sets>
   </Requirements>
 
+  <!-- Minimal FormSettings with a SourceLocation -->
   <FormSettings>
     <Form xsi:type="ItemRead">
       <DesktopSettings>
@@ -44,8 +44,6 @@
   <Rule xsi:type="RuleCollection" Mode="Or">
     <Rule xsi:type="ItemIs" ItemType="Message" FormType="Read"/>
   </Rule>
-
-  <DisableEntityHighlighting>false</DisableEntityHighlighting>
 
   <VersionOverrides xmlns="http://schemas.microsoft.com/office/mailappversionoverrides"
                     xsi:type="VersionOverridesV1_0">
@@ -62,32 +60,14 @@
           <FunctionFile resid="Commands.Url"/>
           <ExtensionPoint xsi:type="MessageComposeCommandSurface">
             <OfficeTab id="TabDefault">
-              <Group id="msgReadGroup">
-                <Label resid="GroupLabel"/>
-
-                <!-- Existing Task Pane button -->
-                <Control xsi:type="Button" id="msgReadOpenPaneButton">
-                  <Label resid="TaskpaneButton.Label"/>
+              <!-- Dedicated group for Validate All Recipients -->
+              <Group id="securityGroup">
+                <Label resid="SecurityGroupLabel"/>
+                <Control xsi:type="Button" id="ValidateAllRecipientsButton">
+                  <Label resid="ValidateAllRecipients.Label"/>
                   <Supertip>
-                    <Title resid="TaskpaneButton.Label"/>
-                    <Description resid="TaskpaneButton.Tooltip"/>
-                  </Supertip>
-                  <Icon>
-                    <bt:Image size="16" resid="Icon.16x16"/>
-                    <bt:Image size="32" resid="Icon.32x32"/>
-                    <bt:Image size="80" resid="Icon.80x80"/>
-                  </Icon>
-                  <Action xsi:type="ShowTaskpane">
-                    <SourceLocation resid="Taskpane.Url"/>
-                  </Action>
-                </Control>
-
-                <!-- New Security Check button -->
-                <Control xsi:type="Button" id="CheckRecipientsButton">
-                  <Label resid="CheckRecipients.Label"/>
-                  <Supertip>
-                    <Title resid="CheckRecipients.Label"/>
-                    <Description resid="CheckRecipients.Tooltip"/>
+                    <Title resid="ValidateAllRecipients.Label"/>
+                    <Description resid="ValidateAllRecipients.Tooltip"/>
                   </Supertip>
                   <Icon>
                     <bt:Image size="16" resid="Icon.16x16"/>
@@ -95,10 +75,9 @@
                     <bt:Image size="80" resid="Icon.80x80"/>
                   </Icon>
                   <Action xsi:type="ExecuteFunction">
-                    <FunctionName>verifySecurity</FunctionName>
+                    <FunctionName>validateAllRecipients</FunctionName>
                   </Action>
                 </Control>
-
               </Group>
             </OfficeTab>
           </ExtensionPoint>
@@ -117,13 +96,11 @@
         <bt:Url id="Taskpane.Url" DefaultValue="https://localhost:3000/taskpane.html"/>
       </bt:Urls>
       <bt:ShortStrings>
-        <bt:String id="GroupLabel" DefaultValue="Contoso Add-in"/>
-        <bt:String id="TaskpaneButton.Label" DefaultValue="Show Task Pane"/>
-        <bt:String id="CheckRecipients.Label" DefaultValue="Check Recipients"/>
+        <bt:String id="SecurityGroupLabel" DefaultValue="Security Tools"/>
+        <bt:String id="ValidateAllRecipients.Label" DefaultValue="Validate All Recipients"/>
       </bt:ShortStrings>
       <bt:LongStrings>
-        <bt:String id="TaskpaneButton.Tooltip" DefaultValue="Opens a pane displaying all available properties."/>
-        <bt:String id="CheckRecipients.Tooltip" DefaultValue="Check if recipients are secured via SecurityCheck API."/>
+        <bt:String id="ValidateAllRecipients.Tooltip" DefaultValue="Validate To, CC, and BCC recipients via SecurityCheck API."/>
       </bt:LongStrings>
     </Resources>
 
