@@ -18,8 +18,8 @@ module.exports = async (env, options) => {
     devtool: "source-map",
     entry: {
       polyfill: ["core-js/stable", "regenerator-runtime/runtime"],
-      taskpane: ["./src/taskpane/taskpane.js", "./src/taskpane/taskpane.html"],
-      commands: "./src/commands/commands.js",
+      taskpane: "./src/taskpane/taskpane.js",   // only JS, not HTML
+      commands: "./src/commands/commands.js",   // only JS
     },
     output: {
       clean: true,
@@ -32,9 +32,7 @@ module.exports = async (env, options) => {
         {
           test: /\.js$/,
           exclude: /node_modules/,
-          use: {
-            loader: "babel-loader",
-          },
+          use: { loader: "babel-loader" },
         },
         {
           test: /\.html$/,
@@ -51,11 +49,19 @@ module.exports = async (env, options) => {
       ],
     },
     plugins: [
+      // Taskpane HTML gets only polyfill + taskpane bundle
       new HtmlWebpackPlugin({
         filename: "taskpane.html",
         template: "./src/taskpane/taskpane.html",
         chunks: ["polyfill", "taskpane"],
       }),
+      // Commands HTML gets only polyfill + commands bundle
+      new HtmlWebpackPlugin({
+        filename: "commands.html",
+        template: "./src/commands/commands.html",
+        chunks: ["polyfill", "commands"],
+      }),
+      // Copy assets and manifest
       new CopyWebpackPlugin({
         patterns: [
           {
@@ -75,11 +81,6 @@ module.exports = async (env, options) => {
           },
         ],
       }),
-      new HtmlWebpackPlugin({
-        filename: "commands.html",
-        template: "./src/commands/commands.html",
-        chunks: ["polyfill", "commands"],
-      }),
     ],
     devServer: {
       headers: {
@@ -87,7 +88,10 @@ module.exports = async (env, options) => {
       },
       server: {
         type: "https",
-        options: env.WEBPACK_BUILD || options.https !== undefined ? options.https : await getHttpsOptions(),
+        options:
+          env.WEBPACK_BUILD || options.https !== undefined
+            ? options.https
+            : await getHttpsOptions(),
       },
       port: process.env.npm_package_config_dev_server_port || 3000,
     },

@@ -1,10 +1,13 @@
-function checkRecipientsSecurity(event) {
+/* eslint-disable no-undef */
+
+// Main implementation
+function verifySecurity(event) {
   try {
     Office.context.mailbox.item.to.getAsync(async (result) => {
       if (result.status === Office.AsyncResultStatus.Succeeded) {
         const recipients = result.value.map(r => r.emailAddress);
 
-        console.log("CheckRecipientsSecurity button clicked, recipients:", recipients);
+        console.log("verifySecurity button clicked, recipients:", recipients);
 
         const response = await fetch("https://localhost:7128/api/email/check-multiple", {
           method: "POST",
@@ -37,4 +40,17 @@ function checkRecipientsSecurity(event) {
   }
 }
 
-Office.actions.associate("checkRecipientsSecurity", checkRecipientsSecurity);
+// Guarded association inside Office.onReady
+Office.onReady(() => {
+  if (typeof verifySecurity === "function") {
+    if (!Office._verifySecurityAssociated) {
+      Office.actions.associate("verifySecurity", verifySecurity);
+      Office._verifySecurityAssociated = true; // flag to prevent duplicates
+      console.log("verifySecurity associated successfully");
+    } else {
+      console.warn("verifySecurity already associated, skipping duplicate registration");
+    }
+  } else {
+    console.error("verifySecurity is not defined or not a function");
+  }
+});
