@@ -1,0 +1,5 @@
+{
+  "devDependencies": {
+    "office-addin-cli": "^2.0.6"
+  }
+}
