@@ -1,3 +1,4 @@
+using EmailSecurityApi.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace EmailSecurityApi.DAL
@@ -6,6 +7,7 @@ namespace EmailSecurityApi.DAL
     {
         public EmailDbContext(DbContextOptions<EmailDbContext> options) : base(options) { }
 
-        public DbSet<EmailEntity> Emails { get; set; }
+        public DbSet<MailgateDirAlias> MailgateDirAlias { get; set; }
+        public DbSet<PORTTLSDomain> PORTTLSDomains { get; set; }
     }
 }

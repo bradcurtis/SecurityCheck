@@ -1,5 +1,4 @@
-using System.Collections.Generic;
-using System.Linq;
+using EmailSecurityApi.Models;
 
 namespace EmailSecurityApi.DAL
 {
@@ -14,18 +13,37 @@ namespace EmailSecurityApi.DAL
 
         public bool EmailExists(string email)
         {
-            return _context.Emails.Any(e => e.Address == email);
+            if (string.IsNullOrWhiteSpace(email))
+                return false;
+
+            var normalizedEmail = email.Trim().ToLowerInvariant();
+            var atIndex = normalizedEmail.IndexOf('@');
+            var domain = atIndex > -1 ? normalizedEmail[(atIndex + 1)..] : string.Empty;
+
+            bool aliasMatch = _context.MailgateDirAlias
+                .Any(a => a.EmailAddress.ToLower() == normalizedEmail);
+
+            bool domainMatch = !string.IsNullOrEmpty(domain) &&
+                _context.PORTTLSDomains
+                .Any(d => d.DomainName.ToLower() == domain);
+
+            return aliasMatch || domainMatch;
         }
 
+        // ✅ AddEmail implementation
         public void AddEmail(string email)
         {
-            _context.Emails.Add(new EmailEntity { Address = email });
-            _context.SaveChanges();
-        }
+            if (string.IsNullOrWhiteSpace(email))
+                return;
 
-        public IEnumerable<string> GetAllEmails()
-        {
-            return _context.Emails.Select(e => e.Address).ToList();
+            var normalizedEmail = email.Trim().ToLowerInvariant();
+
+            _context.MailgateDirAlias.Add(new MailgateDirAlias
+            {
+                EmailAddress = normalizedEmail
+            });
+
+            _context.SaveChanges();
         }
     }
 }

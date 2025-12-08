@@ -7,45 +7,27 @@ var builder = WebApplication.CreateBuilder(args);
 // Add controllers
 builder.Services.AddControllers();
 
-// Default repository registration
-builder.Services.AddScoped<IEmailRepository, InMemoryEmailRepository>();
-
-// Read setting to decide repository type
+// Decide repository type
 bool useDatabase = builder.Configuration.GetValue<bool>("RepositorySettings:UseDatabase");
 
 if (useDatabase)
 {
-    // SQL repository
     builder.Services.AddDbContext<EmailDbContext>(options =>
         options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
     builder.Services.AddScoped<IEmailRepository, SqlEmailRepository>();
 }
 else
 {
-    // In-memory repository
-    builder.Services.AddScoped<IEmailRepository, InMemoryEmailRepository>();
+    builder.Services.AddScoped<IEmailRepository, MockEmailRepository>();
 }
 
 // Add logging wrapper
 builder.Services.AddScoped<ApiLogger>();
 
-// Register OpenAPI support (built into .NET 9)
+// Register OpenAPI support
 builder.Services.AddOpenApi();
 
-// Configure CORS to allow calls from your add-in dev server
-builder.Services.AddCors(options =>
-{
-    options.AddPolicy("AllowAddin", policy =>
-    {
-        policy.WithOrigins(
-            "https://localhost:3000",       // dev server
-            "https://outlook.office.com"    // Outlook Web
-        )
-        .AllowAnyHeader()
-        .AllowAnyMethod();
-    });
-});
-
+// Configure CORS
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAll", policy =>
@@ -56,19 +38,19 @@ builder.Services.AddCors(options =>
     });
 });
 
-
 var app = builder.Build();
 
-// Use HTTPS redirection (ensures API is available at https://localhost:5199)
+// ✅ Now you can use `app`
+var logger = app.Services.GetRequiredService<ILogger<Program>>();
+if (useDatabase)
+    logger.LogInformation("We are using the SQL Repository");
+else
+    logger.LogInformation("We are using the Mock Repository");
+
+// Middleware pipeline
 app.UseHttpsRedirection();
-
-// Enable CORS
 app.UseCors("AllowAll");
-
-// Expose OpenAPI document
 app.MapOpenApi();
-
-// Map controllers
 app.MapControllers();
 
 app.Run();
