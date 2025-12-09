@@ -1,0 +1,37 @@
+What official sources say: New Outlook has limited ribbon support
+
+The spec for add-in commands says that while in general add-ins can extend built-in tabs (or create custom ones), there’s a note that for Outlook: “custom tabs are only supported in classic Outlook on Windows”. 
+Microsoft Learn
++1
+
+For new Outlook on Windows (and Outlook Web / Mac / mobile), you can only put custom groups on built-in tabs — but even that isn’t guaranteed to render the same way as in classic Outlook. 
+Microsoft Learn
++1
+
+A support-knowledge-base article for another add-in scenario stated plainly: in New Outlook, “the ability to add add-ins to the ribbon … is not available.” 
+SAP Support Portal
+
+A more recent article from the Outlook-add-in team confirms that in New Outlook, add-ins are surfaced via the “Apps / More apps” menu (or action bar), not necessarily as pinned ribbon buttons/groups. 
+TECHCOMMUNITY.MICROSOFT.COM
++1
+
+So even though your manifest may be correct, the client (New Outlook) itself simply does not guarantee your custom group appears — because ribbon customization behavior has been scaled back in this version.
+
+⚠️ What this means for you
+
+Just putting a group on a built-in tab (e.g. Message/Compose) does not guarantee it will show when using New Outlook.
+
+Your “Security Tools” group may be “installed” but invisible — or only accessible via the “Apps / More apps” flyout rather than directly on the ribbon.
+
+This appears to be a limitation of New Outlook, not a problem with your manifest. As long as your add-in works in classic Outlook, that suggests your manifest is likely correct.
+
+🎯 What you can do right now (workarounds / guidance)
+
+Educate your users: when using New Outlook, instruct them to use the “Apps / More apps” menu — your add-in should show up there.
+
+Consider a UI-fallback: ensure your add-in’s functions are accessible from the task pane or a launcher that doesn’t rely on the ribbon.
+
+If ribbon visibility for all users is critical: recommend they use classic Outlook (for now).
+
+Monitor updates: the platform seems to be evolving; the blog from late 2023 suggests add-ins in compose mode may appear on the ribbon in New Outlook for “admin-deployed” apps, hinting at partial support. 
+TECHCOMMUNITY.MICROSOFT.COM
